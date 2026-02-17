@@ -67,13 +67,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/riceharvest/opensourceframework.git",
-    "directory": "packages/next-json-ld"
+    "url": "git+https://github.com/riceharvest/next-json-ld.git"
   },
   "bugs": {
-    "url": "https://github.com/riceharvest/opensourceframework/issues?q=is%3Aissue+is%3Aopen+next-json-ld"
+    "url": "https://github.com/riceharvest/next-json-ld/issues"
   },
-  "homepage": "https://github.com/riceharvest/opensourceframework/tree/main/packages/next-json-ld#readme",
+  "homepage": "https://github.com/riceharvest/next-json-ld#readme",
   "publishConfig": {
     "access": "public"
   },
