@@ -1,138 +1,328 @@
-# OpenSource Framework
+# @opensourceframework/next-json-ld
 
-> Maintained forks of abandoned npm packages
+[![npm version](https://badge.fury.io/js/@opensourceframework%2Fnext-json-ld.svg)](https://badge.fury.io/js/@opensourceframework%2Fnext-json-ld)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![License](https://img.shields.io/github/license/opensourceframework/opensourceframework.svg)](./LICENSE)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+JSON-LD structured data helpers for Next.js SEO. Generate Schema.org markup for search engines with full TypeScript support.
 
-## About
+## Features
 
-OpenSource Framework is a monorepo dedicated to maintaining forks of abandoned npm packages. We ensure these valuable tools continue to receive security updates, bug fixes, and compatibility improvements.
+- 🎯 **Type-safe**: Full TypeScript support with comprehensive interfaces
+- 🔍 **SEO-friendly**: Generate valid Schema.org JSON-LD markup
+- ⚡ **Zero dependencies**: Lightweight and tree-shakeable
+- 🧩 **Composable**: Mix and match different schema types on the same page
+- 📦 **Next.js ready**: Works seamlessly with Next.js App Router and Pages Router
 
-## Available Packages
+## Installation
 
-| Package | Original | Status | Description |
-|---------|----------|--------|-------------|
-| [@opensourceframework/next-csrf](./packages/next-csrf) | [next-csrf](https://www.npmjs.com/package/next-csrf) | ![Maintenance](https://img.shields.io/maintenance/yes/2026.svg) | CSRF protection for Next.js |
-| [@opensourceframework/next-images](./packages/next-images) | [next-images](https://www.npmjs.com/package/next-images) | ![Maintenance](https://img.shields.io/maintenance/yes/2026.svg) | Image optimization for Next.js |
-| [@opensourceframework/critters](./packages/critters) | [critters](https://www.npmjs.com/package/critters) | ![Maintenance](https://img.shields.io/maintenance/yes/2026.svg) | CSS inlining for SSR |
-
-## Why OpenSource Framework?
-
-Many npm packages become abandoned over time, leaving projects vulnerable to:
-- **Security vulnerabilities** - No security patches for discovered vulnerabilities
-- **Compatibility issues** - No updates for new Node.js or framework versions
-- **Bug persistence** - Known bugs remain unfixed
-- **TypeScript gaps** - Missing or outdated type definitions
-
-OpenSource Framework solves these problems by:
-- **Active maintenance** - Regular updates and security patches
-- **Community-driven** - Open to contributions and feedback
-- **Transparency** - Clear provenance and changelogs for all packages
-- **Quality standards** - Enforced code standards, testing, and CI/CD
+```bash
+npm install @opensourceframework/next-json-ld
+# or
+yarn add @opensourceframework/next-json-ld
+# or
+pnpm add @opensourceframework/next-json-ld
+```
 
 ## Quick Start
 
-### Installation
+### App Router (Next.js 13+)
 
-```bash
-# Using npm
-npm install @opensourceframework/[package-name]
+```tsx
+// app/layout.tsx or any page.tsx
+import { createOrganizationSchema, createJsonLdScript } from '@opensourceframework/next-json-ld';
 
-# Using yarn
-yarn add @opensourceframework/[package-name]
+export default function Layout({ children }) {
+  const orgSchema = createOrganizationSchema({
+    organization: {
+      name: 'My Business',
+      url: 'https://mybusiness.com',
+      telephone: '+1-555-123-4567',
+      email: 'info@mybusiness.com',
+    },
+    areaServed: {
+      city: 'New York',
+    },
+  });
 
-# Using pnpm
-pnpm add @opensourceframework/[package-name]
+  return (
+    <html>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: createJsonLdScript(orgSchema),
+          }}
+        />
+      </head>
+      <body>{children}</body>
+    </html>
+  );
+}
 ```
 
-### Migration from Original Packages
+### Pages Router
 
-Simply update your imports:
+```tsx
+// pages/_document.tsx or individual pages
+import { createOrganizationSchema, createJsonLdScript } from '@opensourceframework/next-json-ld';
 
-```diff
-- import { something } from 'original-package';
-+ import { something } from '@opensourceframework/original-package';
+export default function Document() {
+  const orgSchema = createOrganizationSchema({
+    organization: {
+      name: 'My Business',
+      url: 'https://mybusiness.com',
+    },
+  });
+
+  return (
+    <Html>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: createJsonLdScript(orgSchema),
+          }}
+        />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
 ```
+
+## API Reference
+
+### Organization Schema
+
+Create structured data for local businesses and organizations.
+
+```typescript
+import { createOrganizationSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createOrganizationSchema({
+  organization: {
+    name: 'My Business',
+    description: 'A great business',
+    url: 'https://mybusiness.com',
+    telephone: '+1-555-123-4567',
+    email: 'info@mybusiness.com',
+    priceRange: '$$',
+    logo: 'https://mybusiness.com/logo.png',
+    image: 'https://mybusiness.com/og-image.jpg',
+    sameAs: [
+      'https://twitter.com/mybusiness',
+      'https://facebook.com/mybusiness',
+    ],
+  },
+  areaServed: {
+    geoMidpoint: { latitude: 40.7128, longitude: -74.0060 },
+    geoRadius: '25km',
+  },
+  openingHoursSpecification: {
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '09:00',
+    closes: '17:00',
+  },
+  type: 'LocalBusiness', // or 'Restaurant', 'Store', etc.
+});
+```
+
+### Service Schema
+
+Create structured data for specific services.
+
+```typescript
+import { createServiceSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createServiceSchema({
+  name: 'Web Development',
+  description: 'Professional web development services',
+  url: 'https://mybusiness.com/services/web-development',
+  image: 'https://mybusiness.com/services/web-dev.jpg',
+  provider: {
+    name: 'My Agency',
+    url: 'https://myagency.com',
+  },
+  serviceType: 'Professional Service',
+  areaServed: {
+    city: 'New York',
+  },
+});
+```
+
+### FAQ Schema
+
+Create structured data for FAQ pages.
+
+```typescript
+import { createFAQSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createFAQSchema([
+  {
+    question: 'What are your hours?',
+    answer: 'We are open 24/7.',
+  },
+  {
+    question: 'Do you offer refunds?',
+    answer: 'Yes, within 30 days of purchase.',
+  },
+]);
+```
+
+### Breadcrumb Schema
+
+Create structured data for navigation breadcrumbs.
+
+```typescript
+import { createBreadcrumbSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createBreadcrumbSchema([
+  { name: 'Home', url: 'https://example.com' },
+  { name: 'Products', url: 'https://example.com/products' },
+  { name: 'Widgets', url: 'https://example.com/products/widgets' },
+]);
+```
+
+### Review Schema
+
+Create structured data for reviews and testimonials.
+
+```typescript
+import { createReviewSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createReviewSchema({
+  organization: {
+    name: 'My Business',
+    url: 'https://mybusiness.com',
+  },
+  reviewCount: 150,
+  ratingValue: 4.8,
+  bestRating: 5,
+  worstRating: 1,
+  reviews: [
+    {
+      author: 'John Doe',
+      reviewBody: 'Excellent service! Would recommend.',
+      reviewRating: 5,
+      datePublished: '2024-01-15',
+    },
+    {
+      author: 'Jane Smith',
+      reviewBody: 'Great experience overall.',
+      reviewRating: 4,
+      datePublished: '2024-01-10',
+    },
+  ],
+});
+```
+
+### Product Schema
+
+Create structured data for e-commerce products.
+
+```typescript
+import { createProductSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createProductSchema({
+  name: 'Premium Widget',
+  description: 'High-quality widget for all your needs',
+  image: 'https://example.com/widget.jpg',
+  brand: 'WidgetCo',
+  sku: 'WGT-001',
+  price: 29.99,
+  priceCurrency: 'USD',
+  availability: 'InStock',
+});
+```
+
+### Article Schema
+
+Create structured data for blog posts and news articles.
+
+```typescript
+import { createArticleSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createArticleSchema({
+  headline: 'How to Build Accessible Websites',
+  description: 'A comprehensive guide to web accessibility',
+  image: 'https://example.com/article.jpg',
+  datePublished: '2024-01-15',
+  dateModified: '2024-01-20',
+  author: 'Jane Smith',
+  publisher: 'Tech Blog',
+  publisherLogo: 'https://example.com/logo.png',
+  url: 'https://example.com/articles/accessible-websites',
+});
+```
+
+### Event Schema
+
+Create structured data for events.
+
+```typescript
+import { createEventSchema } from '@opensourceframework/next-json-ld';
+
+const schema = createEventSchema({
+  name: 'Tech Conference 2024',
+  description: 'Annual technology conference',
+  startDate: '2024-06-15T09:00:00Z',
+  endDate: '2024-06-17T18:00:00Z',
+  location: {
+    name: 'Convention Center',
+    address: '123 Main St, San Francisco, CA',
+  },
+  url: 'https://example.com/events/tech-conf-2024',
+  eventStatus: 'EventScheduled',
+});
+```
+
+### Combining Multiple Schemas
+
+Use `mergeSchemas` to combine multiple schemas on a single page.
+
+```typescript
+import {
+  createOrganizationSchema,
+  createFAQSchema,
+  mergeSchemas,
+  createJsonLdScript,
+} from '@opensourceframework/next-json-ld';
+
+const orgSchema = createOrganizationSchema({
+  organization: { name: 'My Business', url: 'https://mybusiness.com' },
+});
+
+const faqSchema = createFAQSchema([
+  { question: 'What do you do?', answer: 'We provide great services.' },
+]);
+
+const combined = mergeSchemas([orgSchema, faqSchema]);
+
+// Use in your page
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: createJsonLdScript(combined),
+  }}
+/>
+```
+
+## Testing Your Schema
+
+Use the [Google Rich Results Test](https://search.google.com/test/rich-results) to validate your structured data.
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-### Ways to Contribute
-
-- **Report bugs** - Open an issue with detailed reproduction steps
-- **Suggest features** - Share your ideas in discussions or issues
-- **Submit PRs** - Fix bugs, add features, or improve documentation
-- **Review code** - Help maintain code quality
-- **Spread the word** - Star the repo and share with others
-
-## Development
-
-### Prerequisites
-
-- Node.js 20+
-- pnpm 9+
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/opensourceframework/opensourceframework.git
-cd opensourceframework
-
-# Install dependencies
-pnpm install
-
-# Build all packages
-pnpm build
-
-# Run tests
-pnpm test
-
-# Lint code
-pnpm lint
-```
-
-### Project Structure
-
-```
-opensourceframework/
-â packages/           # Forked packages
-â  â next-csrf/      # CSRF protection for Next.js
-â  â next-images/    # Image optimization for Next.js
-â  â critters/       # CSS inlining for SSR
-â tools/              # Shared tooling configurations
-â .github/            # GitHub templates and workflows
-â plans/             # Architecture and planning documents
-```
-
-## Sponsoring
-
-Help sustain this project by becoming a sponsor:
-
-- [GitHub Sponsors](https://github.com/sponsors/opensourceframework)
-- [Open Collective](https://opencollective.com/opensourceframework)
-
-Sponsors get:
-- Recognition in README and releases
-- Priority issue triage
-- Input on package priorities
-
-## Security
-
-We take security seriously. Please see our [Security Policy](./SECURITY.md) for details on reporting vulnerabilities.
+Contributions are welcome! Please read the [contributing guide](../../CONTRIBUTING.md) for details.
 
 ## License
 
-This repository is licensed under the [MIT License](./LICENSE). Individual packages may retain their original licenses if different.
+MIT © [Open Source Framework](https://github.com/opensourceframework)
 
-## Acknowledgments
-
-- Original package authors for their valuable contributions
-- All contributors who help maintain these packages
-- Our sponsors for financial support
 
 ---
 
-Made with ð by the OpenSource Framework community\n\n---\n\nMaintained by @opensourceframework in the [monorepo](https://github.com/riceharvest/opensourceframework).
+Maintained by @opensourceframework in the [monorepo](https://github.com/riceharvest/opensourceframework).
