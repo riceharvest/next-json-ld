@@ -1,6 +1,6 @@
 {
   "name": "@opensourceframework/next-json-ld",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "JSON-LD structured data helpers for Next.js SEO - Generate Schema.org markup for search engines",
   "keywords": [
     "next.js",
@@ -57,7 +57,7 @@
     "@types/node": "^22.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
-    "vitest": "^4.0.18"
+    "vitest": "^2.0.0"
   },
   "peerDependencies": {
     "next": ">=12.0.0",
